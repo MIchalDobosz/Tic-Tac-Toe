@@ -4,23 +4,37 @@ import java.util.Scanner;
 
 public class Game {
 
-    int[][] board;
-    int boardSize;
-    int winStreak;
-    int playersCount;
-    int realPlayer;
-    int counter;
+    public static int[][] board;
+    public static int boardSize = 3; //board size
+    public static int winStreak = 3; //number of marked fields needed to win the game
+    public static int playersCount = 2; //number of players
+    public static int realPlayer = 0; //human players turn (if set to 0 game plays out without human player)
+    public static int counter;
 
-    public Game (int boardSize, int winStreak, int playersCount, int realPlayer) {
-        this.boardSize = boardSize;
-        this.winStreak = winStreak;
-        this.playersCount = playersCount;
-        this.realPlayer = realPlayer;
+    public static void main(String[] args) {
+
+        int result = 0;
         initializeBoard();
         displayBoard();
+        do {
+            for(int i=1; i<=playersCount; i++) {
+                System.out.println("\nPlayer: " + i);
+                makeMove(i);
+                displayBoard();
+                result = checkWinner(i);
+                if(result == 10) {
+                    System.out.println("Winner: " + i);
+                    break;
+                }
+                if(result == 1) {
+                    System.out.println("Draw");
+                    break;
+                }
+            }
+        } while(result == 0);
     }
 
-    public void initializeBoard() {
+    public static void initializeBoard() {
         board = new int[boardSize][boardSize];
 
         for (int i = 0; i < boardSize; i++) {
@@ -30,13 +44,33 @@ public class Game {
         }
     }
 
-    public void displayBoard() {
+    public static void displayBoard() {
         for (int[] i : board) {
             System.out.println(Arrays.toString(i));
         }
     }
 
-    public void makeMove(int player) {
+    public static void makeMove(int player) {
+
+        Scanner scanner = new Scanner(System.in);
+
+        if (player == realPlayer) {
+
+            while (true) {
+                System.out.print("Input Y: ");
+                int x = Integer.parseInt(scanner.next());
+                System.out.print("Input X: ");
+                int y = Integer.parseInt(scanner.next());
+
+                if (board[x][y] == 0) {
+                    board[x][y] = player;
+                    break;
+                } else {
+                    System.out.println("This field is already taken!");
+                }
+            }
+
+        } else {
 
             long startMove = System.currentTimeMillis();
 
@@ -72,9 +106,10 @@ public class Game {
             counter = 0;
             long stopMove = System.currentTimeMillis();
             System.out.println("Czas ruchu: " + (stopMove - startMove));
+        }
     }
 
-    public int checkWinner(int player) {
+    public static int checkWinner(int player) {
 
         int rowCount = 0;
         int colCount = 0;
@@ -147,7 +182,7 @@ public class Game {
         return 0;
     }
 
-    public int checkWinnerWithOffset(int player, int xOffset, int yOffset) {
+    public static int checkWinnerWithOffset(int player, int xOffset, int yOffset) {
 
         int rowCount = 0;
         int colCount = 0;
@@ -209,7 +244,7 @@ public class Game {
         return 0;
     }
 
-    public HashMap<String, Integer> minimax(int player, int depth, int xOffset, int yOffset) {
+    public static HashMap<String, Integer> minimax(int player, int depth, int xOffset, int yOffset) {
         counter++;
         HashMap<String, Integer> bestValue = new HashMap<>();
         HashMap<String, Integer> value;
@@ -239,7 +274,7 @@ public class Game {
         }
 
         // Jeśli głębokośc za duża
-        if (depth > playersCount+1) { //NAJMNIEJSZY MOZLIWY!!! NIE ZMIENIAC!!!
+        if (depth > playersCount+1) {
             bestValue.put("value", 0);
             bestValue.put("depth", depth);
             return bestValue;
